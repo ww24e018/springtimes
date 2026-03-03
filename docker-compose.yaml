@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: springtimes
+      POSTGRES_USER: ${DB_USERNAME:-springtimes}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-springtimes}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-springtimes}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/springtimes
+      DB_USERNAME: ${DB_USERNAME:-springtimes}
+      DB_PASSWORD: ${DB_PASSWORD:-springtimes}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRY_SECONDS: ${JWT_EXPIRY_SECONDS:-86400}
+      APP_USERNAME: ${APP_USERNAME}
+      APP_PASSWORD: ${APP_PASSWORD}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
