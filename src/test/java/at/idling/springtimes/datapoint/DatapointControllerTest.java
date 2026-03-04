@@ -93,6 +93,22 @@ class DatapointControllerTest {
     }
 
     @Test
+    void listDatapoints_noRange_returnsAll() throws Exception {
+        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+
+        mockMvc.perform(post("/categories/" + categoryId + "/datapoints")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.writeValueAsString(new DatapointRequest(now, new BigDecimal("1.00")))))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/categories/" + categoryId + "/datapoints")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
     void createDatapoint_unknownCategory_returnsNotFound() throws Exception {
         DatapointRequest request = new DatapointRequest(Instant.now(), new BigDecimal("1.00"));
 

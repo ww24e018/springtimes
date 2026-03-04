@@ -20,8 +20,8 @@ public class DatapointController {
     @GetMapping
     public List<DatapointResponse> list(
             @PathVariable UUID categoryId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to
     ) {
         return service.findByCategoryAndRange(categoryId, from, to);
     }
